@@ -3,8 +3,6 @@ name: Terraform Validate and Plan
 on:
   pull_request:
     branches: [ main ]
-    paths:
-      - 'terraform/**'
 
 jobs:
   terraform:
