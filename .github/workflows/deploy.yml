@@ -1,0 +1,41 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Build Docker image
+      run: docker build -t myapp:${{ github.sha }} ./app
+
+    - name: Save Docker image
+      run: docker save myapp:${{ github.sha }} | gzip > myapp.tar.gz
+
+    - name: Copy image to EC2
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ec2-user
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: myapp.tar.gz
+        target: /home/ec2-user/
+
+    - name: Deploy on EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ec2-user
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          docker load < /home/ec2-user/myapp.tar.gz
+          docker stop myapp || true
+          docker rm myapp || true
+          docker run -d --name myapp -p 3000:3000 myapp:${{ github.sha }}
+          echo "Deployed ${{ github.sha }}"
