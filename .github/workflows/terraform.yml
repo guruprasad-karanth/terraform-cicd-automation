@@ -23,10 +23,13 @@ jobs:
 
       - name: Terraform Validate
         run: terraform validate
+        env:
+          TF_VAR_ec2_public_key: ${{ secrets.EC2_PUBLIC_KEY }}
 
       - name: Terraform Plan (dry run)
-        run: terraform plan -var-file="../example.tfvars" || true
+        run: terraform plan -var="ec2_public_key=$EC2_PUBLIC_KEY" || true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ap-south-1
+          AWS_DEFAULT_REGION: us-east-1
+          EC2_PUBLIC_KEY: ${{ secrets.EC2_PUBLIC_KEY }}

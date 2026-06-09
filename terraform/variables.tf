@@ -10,3 +10,7 @@ variable "instance_type" {
 variable "project_name" {
   default = "terraform-cicd"
 }
+
+variable "ec2_public_key" {
+  description = "EC2 public key"
+}
