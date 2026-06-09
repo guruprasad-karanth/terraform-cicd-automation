@@ -28,7 +28,7 @@ resource "aws_security_group" "ec2" {
 
 resource "aws_key_pair" "deployer" {
   key_name   = "${var.project_name}-key"
-  public_key = file("~/.ssh/id_rsa.pub")
+  public_key = var.ec2_public_key
 }
 
 resource "aws_instance" "app" {
